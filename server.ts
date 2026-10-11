@@ -783,6 +783,34 @@ app.post('/api/hosted/deploy', (req: Request, res: Response) => {
   });
 });
 
+// Generate /etc/hosts file entries and cURL test commands
+app.all('/api/hosts', (req: Request, res: Response) => {
+  const domain = (req.method === 'POST' ? req.body.domain : req.query.domain) as string || 'neural-stack.ai';
+  const port = Number(req.method === 'POST' ? req.body.port : req.query.port) || 3000;
+
+  const hostsEntries = [
+    `127.0.0.1   ${domain}`,
+    `76.76.21.21 ${domain}`,
+    `76.76.21.21 ns1.apexhost-dns.com`,
+    `76.76.21.21 ns2.apexhost-dns.com`
+  ].join('\n');
+
+  res.json({
+    success: true,
+    domain,
+    port,
+    hostsEntries,
+    instructions: "Run 'sudo nano /etc/hosts' and append the entries above.",
+    commands: {
+      editHosts: "sudo nano /etc/hosts",
+      curlLocalHeader: `curl -i -H "Host: ${domain}" http://127.0.0.1:${port}/`,
+      curlResolve: `curl -i --resolve ${domain}:${port}:127.0.0.1 http://${domain}:${port}/`,
+      curlRenderGateway: `curl -i https://apexhost-cloud-engine-fmro.onrender.com/hosted/${domain}/`
+    },
+    activeHostedDomains: Array.from(hostedDomainsStore.keys())
+  });
+});
+
 // Serve real HTTP files for any hosted domain
 app.get('/hosted/:domain/*', (req: Request, res: Response) => {
   const domain = req.params.domain;
