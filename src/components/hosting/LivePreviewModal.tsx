@@ -296,6 +296,22 @@ export const LivePreviewModal: React.FC<LivePreviewModalProps> = ({
                   : 'w-full h-full'
               }`}
             >
+              {/* Floating Reload Iframe Container Button */}
+              {viewMode === 'real-http' && (
+                <div className="absolute top-3 right-3 z-20 flex items-center space-x-1.5 bg-slate-900/90 backdrop-blur-md border border-slate-700 px-3 py-1.5 rounded-xl shadow-lg">
+                  <span className="text-[11px] font-mono text-slate-300">Live Preview</span>
+                  <button
+                    onClick={handleRefresh}
+                    disabled={isRefreshing}
+                    className="flex items-center space-x-1 px-2.5 py-1 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold rounded-lg text-xs transition shadow cursor-pointer disabled:opacity-50"
+                    title="Reload iframe container and sync files"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
+                    <span>Reload Iframe</span>
+                  </button>
+                </div>
+              )}
+
               {viewMode === 'real-http' ? (
                 /* REAL HTTP SERVER IFRAME */
                 <iframe
